@@ -1,0 +1,25 @@
+{
+  "schema_version": 1,
+  "repository": "https://github.com/The1TrueJoe/powervr_sgx",
+  "branch": "dev",
+  "commit": "fbc83abf423bd8761d046a6f10b94898647cf44e",
+  "selected_utc_date": "2026-11-20",
+  "kernel_base": {
+    "release": "7.3.3-sgx",
+    "source_package_commit": "547e4e697072c8124133a025cf06c2e775bf392f",
+    "note": "Linux version/configuration and gma500/shmem/sysfb patches, firmware sources and UAPI are unchanged through selected dev. Keep base kernel and build SGX module from dev plus maintained MSVDX gma500 overlay.",
+    "module_symvers_sha256": "8fd3b7767d931eff6abde6337a56b32188a39ac5f7f536f2588a8900641e5b60"
+  },
+  "mesa_firmware_ci": {
+    "run_id": 44629294972,
+    "head_sha": "fbc83abf423bd8761d046a6f10b94898647cf44e",
+    "conclusion": "success",
+    "artifact_id": 14581470817,
+    "artifact_name": "mesa-sgx-amd64",
+    "artifact_sha256": "6610f58baea7f22a815a4517e143d85e9ed2282569110f2ed9bc4cffb4c36aa1",
+    "packages": {
+      "sgx545-firmware_0~git20261119.fbc83ab_all.deb": "07fa3b8e0a639119bc2cbfca2241797d5ac1c6abe8b3cb7b3a153406aa0e875e",
+      "mesa-sgx_26.2.5+sgx0~git20261119.fbc83ab_amd64.deb": "9164c22d1dfc80d6803ed8fcdec2cbe75eb21b679b5af355c5d82819f1f18e93"
+    }
+  }
+}

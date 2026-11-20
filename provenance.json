@@ -1,0 +1,31 @@
+{
+  "linux": {
+    "version": "7.3.3",
+    "archive": "https://cdn.kernel.org/pub/linux/kernel/v7.x/linux-7.3.3.tar.xz",
+    "sha256": "79c66dde66cd96877fcde8f7d36aec946b1f423d2b97b5a7b1751b75c764f3d1",
+    "baseline": "kernel/base/linux-7.3.3",
+    "patches": "kernel/gma500-patches"
+  },
+  "graphics": {
+    "repository": "https://github.com/The1TrueJoe/powervr_sgx",
+    "baseline_commit": "547e4e697072c8124133a025cf06c2e775bf392f",
+    "selection": "graphics-dev.lock.json"
+  },
+  "decoder_commands": {
+    "source_lock": "de2-sources.lock.json"
+  },
+  "firmware": {
+    "path": "firmware/msvdx_fw_mfld_DE2.0.bin",
+    "sha256": "6d073592a1f10bc7da269f11fd8f15b6ca3e69c07d9efde4cdaa10f4af6be27b",
+    "license": "firmware/vendor-license.txt",
+    "version": "0x496"
+  },
+  "libdrm": {
+    "version": "2.4.124",
+    "archive": "https://dri.freedesktop.org/libdrm/libdrm-2.4.124.tar.xz",
+    "sha256": "ac36293f61ca4aafaf4b16a2a7afff312aa4f5c37c9fbd797de9e3c0863ca379"
+  },
+  "media": {
+    "attribution": "demo/ATTRIBUTION.md"
+  }
+}

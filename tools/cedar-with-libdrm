@@ -1,0 +1,4 @@
+#!/bin/sh
+# Opt in to the private Cedar auxiliary-device discovery build.
+export LD_LIBRARY_PATH=/opt/cedar-libdrm/lib${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}
+exec "$@"

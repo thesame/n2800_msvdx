@@ -1,0 +1,39 @@
+name: CPU and source checks
+on: [push, pull_request]
+permissions:
+  contents: read
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    container: debian:13
+    steps:
+      - name: Install build dependencies
+        run: |
+          apt-get update
+          apt-get install -y --no-install-recommends build-essential pkg-config libva-dev libdrm-dev python3 git ca-certificates
+      - uses: actions/checkout@v4
+      - name: Build and run CPU checks (no hardware)
+        run: make -j2 check
+      - name: Check manifest and active documentation
+        run: python3 tools/check-repository.py
+  libdrm:
+    runs-on: ubuntu-latest
+    container: debian:13
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install libdrm test dependencies
+        run: |
+          apt-get update
+          apt-get install -y --no-install-recommends build-essential pkg-config meson ninja-build curl xz-utils patch ca-certificates libumockdev-dev umockdev
+      - name: Apply series and run portable topology tests
+        run: |
+          mkdir -p build/libdrm
+          curl -fsSL https://deb.debian.org/debian/pool/main/libd/libdrm/libdrm_2.4.124.orig.tar.xz -o build/libdrm.tar.xz
+          echo 'ac36293f61ca4aafaf4b16a2a7afff312aa4f5c37c9fbd797de9e3c0863ca379  build/libdrm.tar.xz' | sha256sum -c -
+          tar -xf build/libdrm.tar.xz -C build/libdrm --strip-components=1
+          for patch_file in patches/libdrm/*.patch; do
+            patch -d build/libdrm -p1 --fuzz=0 < "$patch_file"
+          done
+          meson setup build/libdrm-build build/libdrm --auto-features=disabled -Dtests=true
+          ninja -C build/libdrm-build tests/device-topology
+          meson test -C build/libdrm-build --print-errorlogs

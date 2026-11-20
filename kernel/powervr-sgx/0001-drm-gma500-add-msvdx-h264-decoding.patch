@@ -1,0 +1,67 @@
+diff --git a/Makefile b/Makefile
+--- a/Makefile
++++ b/Makefile
+@@ -4,6 +4,7 @@
+ #
+ 
+ gma500_gfx-y += \
++	  cdv_msvdx.o \
+ 	  backlight.o \
+ 	  cdv_device.o \
+ 	  cdv_intel_crt.o \
+diff --git a/psb_drv.c b/psb_drv.c
+--- a/psb_drv.c
++++ b/psb_drv.c
+@@ -36,6 +36,7 @@
+ #include "psb_intel_reg.h"
+ #include "psb_irq.h"
+ #include "psb_reg.h"
++#include "cdv_msvdx.h"
+ 
+ static const struct drm_driver driver;
+ static int psb_pci_probe(struct pci_dev *pdev, const struct pci_device_id *ent);
+@@ -492,6 +493,12 @@
+ 	if (ret)
+ 		return ret;
+ 
++	ret = cdv_msvdx_register(dev);
++	if (ret) {
++		drm_dev_unregister(dev);
++		return ret;
++	}
++
+ 	drm_client_setup(dev, NULL);
+ 
+ 	return 0;
+@@ -501,6 +508,7 @@
+ {
+ 	struct drm_device *dev = pci_get_drvdata(pdev);
+ 
++	cdv_msvdx_remove(dev);
+ 	drm_dev_unregister(dev);
+ }
+ 
+diff --git a/power.c b/power.c
+--- a/power.c
++++ b/power.c
+@@ -34,6 +34,7 @@
+ #include "psb_reg.h"
+ #include "psb_intel_reg.h"
+ #include "psb_irq.h"
++#include "cdv_msvdx.h"
+ #include <linux/mutex.h>
+ #include <linux/pm_runtime.h>
+ 
+@@ -180,6 +181,12 @@
+ 	struct pci_dev *pdev = to_pci_dev(_dev);
+ 	struct drm_device *dev = pci_get_drvdata(pdev);
+ 
++	int ret;
++
++	ret = cdv_msvdx_power_suspend(dev);
++	if (ret)
++		return ret;
++
+ 	gma_irq_uninstall(dev);
+ 	gma_suspend_display(dev);
+ 	gma_suspend_pci(pdev);

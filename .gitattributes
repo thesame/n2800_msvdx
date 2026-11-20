@@ -1,0 +1,9 @@
+kernel/base/** linguist-vendored=true
+sources/** linguist-vendored=true
+demo/*.mp4 binary
+firmware/*.bin binary
+# Preserve imported source, licenses and patch context byte-for-byte.
+*.patch -whitespace
+kernel/base/** -whitespace
+sources/** -whitespace
+firmware/vendor-license.txt -whitespace

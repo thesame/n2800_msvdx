@@ -1,0 +1,30 @@
+CC ?= cc
+PKG_CONFIG ?= pkg-config
+CFLAGS ?= -O2 -g
+CPPFLAGS += -D_POSIX_C_SOURCE=200809L
+WARN = -std=c11 -Wall -Wextra -Werror -Wformat=2 -Wshadow
+VA_FLAGS = $(shell $(PKG_CONFIG) --cflags libva libdrm)
+TRANSPORT = src/decoder-transport.c src/broker-wire.c
+HEADERS = src/decoder-transport.h include/cedar-broker.h include/cedar-msvdx.h
+.PHONY: all check clean
+all: build/cedar_drv_video.so build/cedar-decoder-broker
+build:
+	mkdir -p $@
+build/cedar_drv_video.so: src/va-driver.c $(TRANSPORT) $(HEADERS) | build
+	$(CC) $(CPPFLAGS) $(CFLAGS) $(WARN) -Wno-unused-parameter -fPIC -shared -Iinclude $(VA_FLAGS) src/va-driver.c $(TRANSPORT) -o $@ $(LDFLAGS) -pthread -ldl
+build/cedar-decoder-broker: src/decoder-broker.c src/broker-wire.c $(HEADERS) | build
+	$(CC) $(CPPFLAGS) $(CFLAGS) $(WARN) -Iinclude src/decoder-broker.c src/broker-wire.c -o $@ $(LDFLAGS)
+build/test-va-image: tests/test-va-image.c src/va-driver.c $(TRANSPORT) $(HEADERS) | build
+	$(CC) $(CPPFLAGS) $(CFLAGS) $(WARN) -Wno-unused-parameter -Iinclude $(VA_FLAGS) tests/test-va-image.c $(TRANSPORT) -o $@ $(LDFLAGS) -pthread -ldl
+build/test-broker: tests/test-broker.c $(TRANSPORT) $(HEADERS) | build
+	$(CC) $(CPPFLAGS) $(CFLAGS) $(WARN) -Iinclude tests/test-broker.c $(TRANSPORT) -o $@ $(LDFLAGS) -ldl
+build/test-h264-dma: tests/test-h264-dma.c include/cedar-msvdx-dma.h include/cedar-msvdx.h | build
+	$(CC) $(CPPFLAGS) $(CFLAGS) $(WARN) -Iinclude tests/test-h264-dma.c -o $@ $(LDFLAGS)
+check: all build/test-va-image build/test-broker build/test-h264-dma
+	./build/test-va-image
+	./build/test-broker
+	./build/test-h264-dma
+	python3 tests/test-verify-decode.py
+	python3 tests/test-h264-stream.py
+clean:
+	rm -rf build
