@@ -15,7 +15,9 @@ jobs:
       - name: Build and run CPU checks (no hardware)
         run: make -j2 check
       - name: Check manifest and active documentation
-        run: python3 tools/check-repository.py
+        run: |
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
+          python3 tools/check-repository.py
   libdrm:
     runs-on: ubuntu-latest
     container: debian:13
@@ -24,7 +26,14 @@ jobs:
       - name: Install libdrm test dependencies
         run: |
           apt-get update
-          apt-get install -y --no-install-recommends build-essential pkg-config meson ninja-build curl xz-utils patch ca-certificates libumockdev-dev umockdev
+          apt-get install -y --no-install-recommends build-essential pkg-config meson ninja-build curl xz-utils patch ca-certificates valac libglib2.0-dev libudev-dev libpcap-dev
+      - name: Build mock-device dependency with fstat interception
+        run: |
+          sh tools/build-test-umockdev.sh
+          prefix="$PWD/build/umockdev-test/install"
+          echo "$prefix/bin" >> "$GITHUB_PATH"
+          echo "PKG_CONFIG_PATH=$prefix/lib/pkgconfig" >> "$GITHUB_ENV"
+          echo "LD_LIBRARY_PATH=$prefix/lib" >> "$GITHUB_ENV"
       - name: Apply series and run portable topology tests
         run: |
           mkdir -p build/libdrm
